@@ -23,6 +23,15 @@ class DevelopmentConfig(DefaultConfig):
     REDIS_HOST = "127.0.0.1"
     REDIS_PORT = 6379
 
+    # JWT 秘钥
+    JWT_SECRET = "gVtEg7VAMhKsyMCeeQwIZFfy7TLy7ihurVIRpN2kuxekOJz5tg+yuw=="
+
+    # 用户token过期时长- 2小时过期
+    JWT_USER_EXPIRE = 2
+
+    # 刷新token过期时长 - 14天过期
+    JWT_REFRESH_EXPIRE = 14
+
 
 class ProductionConfig(DefaultConfig):
     """生产模式的配置类"""
