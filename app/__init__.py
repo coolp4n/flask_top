@@ -4,6 +4,7 @@ from .settings.config import config_dict
 import sys
 import os
 from redis import StrictRedis
+from flask_migrate import Migrate
 
 # 2.将common添加到系统搜索路径中
 # /Users/chenqian/Desktop/深圳37期Flask项目/HMTopNews
@@ -36,16 +37,7 @@ def create_flask_app(type):
     # silent=True 加载失败也不会报错
     app.config.from_envvar(EXTRA_ENV_COINFIG, silent=True)
 
-    # 4.延迟绑定app对象和db数据库对象
-    db.init_app(app)
 
-    # 5.延迟初始化redis客户端对象
-    # decode_responses=True 将响应进行解析-bytes转换成字符串
-    # 将局部变量声明为全局变量
-    global redis_client
-    redis_client = StrictRedis(host=app.config["REDIS_HOST"],
-                               port=app.config["REDIS_PORT"],
-                               decode_responses=True)
 
     return app
 
@@ -57,7 +49,48 @@ def create_app(type):
     # 1.创建app对象
     app = create_flask_app(type)
 
-    # 2.初始化组件
-    # TODO:组成蓝图的初始化组件
+    # 2.注册拓展信息组件化
+    register_extensions(app)
+
+    # 3.注册蓝图的初始化组件
+    register_bluprint(app)
 
     return app
+
+
+def register_bluprint(app: Flask):
+    # 注册user模块的蓝图对象
+    # 防止循环导包：cannot import x_module
+    # 延后导包，懒加载，用到的时候再导包
+    from app.resources.user import user_bp
+    # 注册蓝图
+    app.register_blueprint(user_bp)
+
+    # 注册自定义转换器类
+    # app.url_map.converters["key"] = classNAME
+
+
+def register_extensions(app: Flask):
+
+    # 4.延迟绑定app对象和db数据库对象
+    db.init_app(app)
+
+    # 5.延迟初始化redis客户端对象
+    # decode_responses=True 将响应进行解析-bytes转换成字符串
+    # 将局部变量声明为全局变量
+    global redis_client
+    redis_client = StrictRedis(host=app.config["REDIS_HOST"],
+                               port=app.config["REDIS_PORT"],
+                               decode_responses=True)
+
+    # TODO：注意：先自定义转换器，再注册蓝图，因为蓝图注册的时候就用到了自定义的转换器
+    # 添加自定义转换器组件
+    from utils.converters import register_converters
+    register_converters(app)
+
+    # 数据库迁移
+    Migrate(app, db)
+
+    # 注意：需要让Flask项目知道有user.py文件的存在，同时按照文件中定义的模型类进行表的迁移
+    from models import user
+

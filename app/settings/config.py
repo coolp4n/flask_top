@@ -3,6 +3,8 @@ class DefaultConfig(object):
     """项目默认配置类  [父类]"""
     # 共同的配置信息
     SCRECT_KEY = "python37"
+    # restful中不允许ascii编码
+    RESTFUL_JSON = {"ensure_ascii": False}
 
 
 class DevelopmentConfig(DefaultConfig):
@@ -15,8 +17,11 @@ class DevelopmentConfig(DefaultConfig):
     SQLALCHEMY_ECHO = True
 
     # redis数据库配置[注意：连接到redis的主数据库]
-    REDIS_HOST = "192.168.243.154"
-    REDIS_PORT = 6381
+    # TODO: 服务器redis设置外网能够访问
+    # REDIS_HOST = "192.168.243.154"
+    # REDIS_PORT = 6381
+    REDIS_HOST = "127.0.0.1"
+    REDIS_PORT = 6379
 
 
 class ProductionConfig(DefaultConfig):
