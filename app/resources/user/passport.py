@@ -113,8 +113,6 @@ class LoginRegisterResource(Resource):
         """
 
         # 1.获取参数
-        # 1.1 mobile 手机号码
-        # 1.2 smscode 短信验证码
         # 2.解析参数
         # 构建解析对象
         parser = RequestParser()
@@ -130,16 +128,18 @@ class LoginRegisterResource(Resource):
         # 开始解析
         ret = parser.parse_args()
         # 提取解析结果
+        # 手机号码
         phone = ret["mobile"]
+        # 短信验证码
         smscode = ret["smscode"]
 
         # 3.业务逻辑
         # 3.1 根据手机号码去redis数据库取出真实的短信验证码 real_smscode
-
         redis_key = "app:code:{}".format(phone)
         real_smscode = redis_client.get(redis_key)
 
         # 3.2 短信验证码是否有值，是否和用户填写的短信验证码一致
+        # 注意： "123456"  b'123456' decode_responses=True
         if real_smscode is None or real_smscode != smscode:
             return {"message": "invalid sms_code"}, 400
 
