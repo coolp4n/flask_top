@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from .passport import SMSCodesResource,LoginRegisterResource
+from .passport import SMSCodesResource, LoginRegisterResource
 from utils.output import output_json
 from utils.constants import USER_URL_PREFIX
 
