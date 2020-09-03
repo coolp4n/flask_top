@@ -1,5 +1,6 @@
 from app import create_app
 from flask import jsonify
+from flask_sqlalchemy import SQLAlchemy
 
 # 创建开发模式的app对象
 app = create_app("dev")

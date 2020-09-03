@@ -9,8 +9,14 @@ class DevelopmentConfig(DefaultConfig):
     """开发模式的配置类"""
     DEBUG = True
 
-    # TODO: mysql数据库配置
-    # TODO: redis数据库配置
+    # mysql数据库配置
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:mysql@192.168.243.154:3306/HMTopnews37"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = True
+
+    # redis数据库配置[注意：连接到redis的主数据库]
+    REDIS_HOST = "192.168.243.154"
+    REDIS_PORT = 6381
 
 
 class ProductionConfig(DefaultConfig):
