@@ -3,14 +3,34 @@ class DefaultConfig(object):
     """项目默认配置类  [父类]"""
     # 共同的配置信息
     SCRECT_KEY = "python37"
+    # restful中不允许ascii编码
+    RESTFUL_JSON = {"ensure_ascii": False}
 
 
 class DevelopmentConfig(DefaultConfig):
     """开发模式的配置类"""
     DEBUG = True
 
-    # TODO: mysql数据库配置
-    # TODO: redis数据库配置
+    # mysql数据库配置
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:mysql@192.168.243.154:3306/HMTopnews37"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = True
+
+    # redis数据库配置[注意：连接到redis的主数据库]
+    # TODO: 服务器redis设置外网能够访问
+    # REDIS_HOST = "192.168.243.154"
+    # REDIS_PORT = 6381
+    REDIS_HOST = "127.0.0.1"
+    REDIS_PORT = 6379
+
+    # JWT 秘钥
+    JWT_SECRET = "gVtEg7VAMhKsyMCeeQwIZFfy7TLy7ihurVIRpN2kuxekOJz5tg+yuw=="
+
+    # 用户token过期时长- 2小时过期
+    JWT_USER_EXPIRE = 2
+
+    # 刷新token过期时长 - 14天过期
+    JWT_REFRESH_EXPIRE = 14
 
 
 class ProductionConfig(DefaultConfig):
