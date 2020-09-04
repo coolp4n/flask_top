@@ -4,7 +4,7 @@ from app import redis_client, db
 from models.user import User
 from utils.constants import APP_SMSCODE_EXPIRE
 from datetime import datetime, timedelta
-from flask import current_app
+from flask import current_app, g
 from utils.jwt_util import generate_jwt, verify_jwt
 from flask_restful.reqparse import RequestParser
 from utils.parser import mobile
@@ -165,4 +165,16 @@ class LoginRegisterResource(Resource):
 
     def put(self):
         """刷新token请求"""
-        pass
+
+        # 判断提交的token是刷新token
+        user_id = g.user_id
+        is_refresh = g.is_refresh
+        # 刷新token有效
+        if user_id and is_refresh:
+
+            # 重新生成一个新的2小时有效的token
+            token, _ = self._genrateJWT(user_id)
+            return {"new_token": token}, 201
+        else:
+            # 刷新token失效了-必须重新登录
+            return {"message": "invalid refresh token"}, 403
