@@ -35,3 +35,17 @@ def id_number(value):
         return value.upper()
     else:
         raise ValueError('Invalid id number.')
+
+
+def imgtype(value):
+    """图片类型检查"""
+
+    try:
+        type = imghdr.what(value)
+    except Exception as e:
+        raise ValueError(e)
+    else:
+        if type:
+            return value
+        else:
+            raise ValueError("invalid image type")
