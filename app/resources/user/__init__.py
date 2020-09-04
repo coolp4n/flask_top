@@ -1,6 +1,7 @@
 from flask import Blueprint
 from flask_restful import Api
 from .passport import SMSCodesResource, LoginRegisterResource
+from .profile import CurrentUserResource
 from utils.output import output_json
 from utils.constants import USER_URL_PREFIX
 
@@ -14,6 +15,8 @@ user_api = Api(user_bp)
 # mob 自定义转换器进行手机号码格式验证
 user_api.add_resource(SMSCodesResource, '/sms/codes/<mob:mobile>')
 user_api.add_resource(LoginRegisterResource, '/authorizations')
+# /app/user
+user_api.add_resource(CurrentUserResource, '/user')
 # 4.在app中注册蓝图对象
 
 # 5.自定义返回的json格式
