@@ -6,6 +6,12 @@ class DefaultConfig(object):
     # restful中不允许ascii编码
     RESTFUL_JSON = {"ensure_ascii": False}
 
+    # 七牛云的配置信息
+    QINIU_ACCESS_KEY = 'W0oGRaBkAhrcppAbz6Nc8-q5EcXfL5vLRashY4SI'
+    QINIU_SECRET_KEY = 'tsYCBckepW4CqW0uHb9RdfDMXRDOTEpYecJAMItL'
+    QINIU_BUCKET_NAME = 'szpython37'
+    QINIU_DOMAIN = 'http://qg457zgw6.hn-bkt.clouddn.com/'
+
 
 class DevelopmentConfig(DefaultConfig):
     """开发模式的配置类"""
