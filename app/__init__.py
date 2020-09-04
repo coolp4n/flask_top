@@ -86,10 +86,14 @@ def register_extensions(app: Flask):
     register_converters(app)
 
     # 数据库迁移
+    # export FLASK_APP='app.main'  不然会报错
+    # flask db migrate
+    # flask db upgrade
     Migrate(app, db)
 
     # 注意：需要让Flask项目知道有user.py文件的存在，同时按照文件中定义的模型类进行表的迁移
     from models import user
+    from models import article
 
     # 给get_userinfo添加before_request装饰器
     # 在请求进入视图函数之前，统一提取用户token信息
