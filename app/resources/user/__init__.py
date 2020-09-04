@@ -1,7 +1,8 @@
 from flask import Blueprint
 from flask_restful import Api
 from .passport import SMSCodesResource, LoginRegisterResource
-from .profile import CurrentUserResource
+from .profile import CurrentUserResource, UserPhotoResource
+from .channel import UserChannelResource
 from utils.output import output_json
 from utils.constants import USER_URL_PREFIX
 
@@ -17,6 +18,11 @@ user_api.add_resource(SMSCodesResource, '/sms/codes/<mob:mobile>')
 user_api.add_resource(LoginRegisterResource, '/authorizations')
 # /app/user
 user_api.add_resource(CurrentUserResource, '/user')
+# /app/user/photo
+user_api.add_resource(UserPhotoResource, '/user/photo')
+# /app/user/channels
+user_api.add_resource(UserChannelResource, '/user/channels')
+
 # 4.在app中注册蓝图对象
 
 # 5.自定义返回的json格式
