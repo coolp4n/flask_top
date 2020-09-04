@@ -44,7 +44,8 @@ def upload_file(data):
         url_prefix = current_app.config["QINIU_DOMAIN"]
         pic_name = ret["key"]
         full_url = url_prefix + pic_name
-        return full_url
+        # 返回图片名称和完整url地址
+        return pic_name, full_url
     else:
         # 工具类里面的异常信息，需要抛出，不能私自处理,否则调用者不知如何处理异常
         raise BaseException(info.exception)

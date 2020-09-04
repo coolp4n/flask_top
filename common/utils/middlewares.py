@@ -23,7 +23,7 @@ def get_userinfo():
     刷新token： g.user_id = 1
                g.is_refresh = True
     
-    刷新token只是在用户token过期之后，请求一个新的用户token， 不能用来做权限认证
+    刷新token只是在用户token过期之后，请求一个新的用户token， 不能用来做登录权限认证
     """
 
     g.user_id = None

@@ -1,8 +1,11 @@
 # 强制登录装饰器
 from flask import g
+from functools import wraps
 
 
 def login_required(view_func):
+    # 防止装饰器修改被装饰函数名和文档等信息
+    @wraps(view_func)
     def wrapper(*args, **kwargs):
 
         # 从g对象中提取用户user_id
