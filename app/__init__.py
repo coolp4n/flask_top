@@ -95,3 +95,11 @@ def register_extensions(app: Flask):
     # 在请求进入视图函数之前，统一提取用户token信息
     from utils.middlewares import get_userinfo
     app.before_request(get_userinfo)
+
+    from flask_cors import CORS
+    # 允许跨域请求
+    # app 允许跨域的后端app
+    # supports_credentials=True 允许跨域访问时携带cookie或者证书token
+    # origins=["http://127.0.0.1:5000"] 允许前端那个网站跨域访问后端， 默认：所有网站都可以访问
+    # methods = [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE] 允许所有请求跨域访问
+    CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5000"])
