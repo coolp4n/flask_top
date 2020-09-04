@@ -13,22 +13,23 @@ from utils.img_storage import upload_file
 class UserPhotoResource(Resource):
     """修改头像类视图"""
 
+    # 局部刷新数据: patch
+    # put post get del
+    """
+    思路：
+    # 1.获取参数
+    # 1.1 photo前端上传的图片数据
+    # 1.2 user_id 从g对象中获取
+    # 2.校验参数
+    # 3.逻辑处理
+    # 3.1 提取图片二进制数据，使用封装的图片上传工具类将图片保存到七牛云
+    # 3.2 图片的url地址，将用户对象中用户头像url进行更新，提交到数据库
+    # 4.返回值处理
+    # 4.1 将完整的图片url地址返回给前端
+    """
     method_decorators = {"patch": [login_required]}
 
-    # 局部刷新数据
-    # put post get del dispath
     def patch(self):
-        """
-        # 1.获取参数
-        # 1.1 photo前端上传的图片数据
-        # 1.2 user_id 从g对象中获取
-        # 2.校验参数
-        # 3.逻辑处理
-        # 3.1 提取图片二进制数据，使用封装的图片上传工具类将图片保存到七牛云
-        # 3.2 图片的url地址，将用户对象中用户头像url进行更新，提交到数据库
-        # 4.返回值处理
-        # 4.1 将完整的图片url地址返回给前端
-        """
 
         # 1.获取参数
         # 1.1 photo前端上传的图片数据
