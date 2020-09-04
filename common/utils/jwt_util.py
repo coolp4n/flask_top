@@ -31,6 +31,7 @@ def verify_jwt(token, secret=None):
         secret = current_app.config['JWT_SECRET']
 
     try:
+        # 如果过期，有异常，载荷就为空
         payload = jwt.decode(token, secret, algorithm=['HS256'])
     except jwt.PyJWTError:
         payload = None

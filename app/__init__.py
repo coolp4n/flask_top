@@ -37,8 +37,6 @@ def create_flask_app(type):
     # silent=True 加载失败也不会报错
     app.config.from_envvar(EXTRA_ENV_COINFIG, silent=True)
 
-
-
     return app
 
 
@@ -71,7 +69,6 @@ def register_bluprint(app: Flask):
 
 
 def register_extensions(app: Flask):
-
     # 4.延迟绑定app对象和db数据库对象
     db.init_app(app)
 
@@ -94,3 +91,7 @@ def register_extensions(app: Flask):
     # 注意：需要让Flask项目知道有user.py文件的存在，同时按照文件中定义的模型类进行表的迁移
     from models import user
 
+    # 给get_userinfo添加before_request装饰器
+    # 在请求进入视图函数之前，统一提取用户token信息
+    from utils.middlewares import get_userinfo
+    app.before_request(get_userinfo)

@@ -88,8 +88,8 @@ class LoginRegisterResource(Resource):
         # 在用户无感知的情况下，使用该refresh_token进行刷新请求，获取一个新的2小时有效token
         refresh_token = generate_jwt(refresh_payload, expiry=expiry_14day, secret=secret)
 
-        # 403token过期==> 前端工作人员 ==>refresh_token ==> 发给后端put ==>返回一个2小时有效的token
-        # 401刷新token也过期了 当刷新token，14天过期后，只能重新登录
+        # 401 token过期==> 前端工作人员 ==>refresh_token ==> 发给后端put ==>返回一个2小时有效的token
+        # 403 刷新token也过期了 当刷新token，14天过期后，只能重新登录
         return token, refresh_token
 
     def post(self):
@@ -128,7 +128,7 @@ class LoginRegisterResource(Resource):
         # 开始解析
         ret = parser.parse_args()
         # 提取解析结果
-        # 手机号码
+        # 手机号码 string
         phone = ret["mobile"]
         # 短信验证码
         smscode = ret["smscode"]
