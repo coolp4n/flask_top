@@ -47,8 +47,8 @@ class Relation(db.Model):
         BLACKLIST = 2
 
     id = db.Column(db.Integer, primary_key=True, doc='主键ID')
-    user_id = db.Column(db.Integer, doc='用户ID')
-    author_id = db.Column(db.Integer, doc='目标用户ID')
+    user_id = db.Column(db.Integer, doc='用户ID')  # 粉丝id
+    author_id = db.Column(db.Integer, doc='目标用户ID') # 作者id
     relation = db.Column(db.Integer, doc='关系')
     update_time = db.Column(db.DateTime, default=datetime.now, doc='更新时间')
 
