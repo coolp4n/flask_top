@@ -121,7 +121,7 @@ class LoginRegisterResource(Resource):
                             required=True,
                             location='json', type=mobile)
 
-        parser.add_argument("smscode",
+        parser.add_argument("code",
                             required=True,
                             location='json', type=regex(r'\d{6}'))
 
@@ -131,7 +131,7 @@ class LoginRegisterResource(Resource):
         # 手机号码 string
         phone = ret["mobile"]
         # 短信验证码
-        smscode = ret["smscode"]
+        smscode = ret["code"]
 
         # 3.业务逻辑
         # 3.1 根据手机号码去redis数据库取出真实的短信验证码 real_smscode
