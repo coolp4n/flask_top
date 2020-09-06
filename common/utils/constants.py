@@ -6,3 +6,6 @@ APP_SMSCODE_EXPIRE = 300
 
 # 用户模块URL前缀
 USER_URL_PREFIX = '/app'
+
+# 首页展示 每页的文章数量
+HOME_PRE_PAGE = 20
