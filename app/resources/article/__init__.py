@@ -1,9 +1,11 @@
 from flask import Blueprint
+
+from app.resources.article.following import UserFollowingResource
 from utils.constants import USER_URL_PREFIX
 from flask_restful import Api
 from utils.output import output_json
 from .channel import AllChannelResource
-from .article import ArticleListResource
+from .article import ArticleListResource, ArticleDetailResource
 
 # 1.创建文章蓝图对象
 article_bp = Blueprint("article_bp", __name__, url_prefix=USER_URL_PREFIX)
@@ -19,3 +21,6 @@ article_api.representation(mediatype='application/json')(output_json)
 article_api.add_resource(AllChannelResource, '/channels')
 # /app/articles
 article_api.add_resource(ArticleListResource, '/articles')
+# /app/articles/article_id
+article_api.add_resource(ArticleDetailResource, '/articles/<int:article_id>')
+article_api.add_resource(UserFollowingResource, '/user/followings')
