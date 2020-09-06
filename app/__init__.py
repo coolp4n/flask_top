@@ -64,6 +64,10 @@ def register_bluprint(app: Flask):
     # 注册蓝图
     app.register_blueprint(user_bp)
 
+    # 注册文章蓝图对象
+    from app.resources.article import article_bp
+    app.register_blueprint(article_bp)
+
     # 注册自定义转换器类
     # app.url_map.converters["key"] = classNAME
 

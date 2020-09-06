@@ -6,12 +6,12 @@ from sqlalchemy.orm import load_only
 
 
 class UserChannelResource(Resource):
-    """当前登录用户的频道信息视图类"""
+    """用户的频道信息视图类"""
 
     """
     思路：
         # 1.获取参数
-        # 1.1 当前登录用户 user_id
+        # 1.1 如果有登录当前登录用户 user_id
         # 2.校验参数
         # 3.业务逻辑
         # 3.1 根据用户id查询联合查询频道表和用户频道表，查询到频道id和频道名称
