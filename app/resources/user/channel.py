@@ -1,5 +1,7 @@
-from flask import g
+from flask import g, request
 from flask_restful import Resource
+
+from app import db
 from models.article import Channel, UserChannel
 from utils.decorators import login_required
 from sqlalchemy.orm import load_only
@@ -19,7 +21,8 @@ class UserChannelResource(Resource):
         # 3.2 当前用户未选择任何频道，查询默认频道
         # 4.返回值处理
     """
-    # method_decorators = {"get": [login_required]}
+
+    method_decorators = {"put": [login_required]}
 
     def get(self):
         # 1.获取参数
@@ -56,3 +59,61 @@ class UserChannelResource(Resource):
 
         # 返回频道列表
         return {"channels": channel_dict_lit}
+
+    """
+    思路：
+        # 1.获取参数
+        # 1.1 获取编辑之后的频道列表channels : [{id:1, seq: 2}, ...] 来源：json
+        # 1.2 登录用户user_id
+        # 2.校验参数
+        # 3.逻辑处理
+        # 3.1 首先将所有用户的频道设置为删除状态
+        # 3.2 根据用户user_id和频道id去用户频道表查询频道信息
+        # 3.3 频道存在：频道移动：seq赋值 ，修改成未删除：is_delete=False
+        # 3.4 频道不存在：新建一个新的用户频道，添加到数据库
+        # 4.处理响应
+        # 4.1 序列化频道对象列表
+    """
+
+    def put(self):
+
+        # 1.获取参数
+        # 1.1 获取编辑之后的频道列表channels : [{id:1, seq: 2}, ...] 来源：json
+        # 1.2 登录用户user_id
+        # 2.校验参数
+        channels = request.json.get("channels")
+        # 获取用户id
+        user_id = g.user_id
+        # 3.逻辑处理
+        # 3.1 首先将所有用户的频道设置为删除状态
+        UserChannel.query.filter(UserChannel.user_id == user_id,
+                                 UserChannel.is_deleted == False) \
+            .update({"is_deleted": True})
+
+        # 遍历得到频道字典
+        for channel in channels:
+            # {id:1, seq: 2}
+            # 3.2 根据用户user_id和频道id去用户频道表查询频道信息
+            user_channel = UserChannel.query.options(load_only(UserChannel.id)) \
+                .filter(UserChannel.user_id == user_id, UserChannel.channel_id == channel["id"]).first()
+            # 3.3 频道存在：频道移动：seq赋值 ，修改成未删除：is_delete=False
+            if user_channel:
+                # 标记未删除
+                user_channel.is_deleted = False
+                # 移动频道
+                user_channel.sequence = channel["seq"]
+
+            # 3.4 频道不存在：新建一个新的用户频道，添加到数据库
+            else:
+                user_channel = UserChannel(user_id=user_id,
+                                           channel_id=channel["id"],
+                                           sequence=channel["seq"])
+
+                db.session.add(user_channel)
+
+        # 循环结束提交修改更新到数据库
+        db.session.commit()
+
+        # 4.处理响应
+        # 4.1 序列化频道对象列表
+        return {"channels": channels, "message": "修改频道成功"}
