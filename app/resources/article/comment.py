@@ -29,6 +29,7 @@ class CommentResource(Resource):
     """
 
     def post(self):
+        """发布主评论 + 回复子评论"""
         # 1.获取参数
         # 1.1 当前登录用户id: user_id
         user_id = g.user_id
@@ -36,31 +37,61 @@ class CommentResource(Resource):
         parser = RequestParser()
         parser.add_argument("target", type=int, required=True, location='json')
         parser.add_argument("content", type=regex(r'.+'), required=True, location='json')
+        parser.add_argument("parent_id", type=int, location='json')
         ret = parser.parse_args()
         # 1.2 发布评论的文章id：target
         article_id = ret.target
         # 1.3 评论内容： content
         comment_content = ret.content
-        # 2.参数校验
+        # 1.4 获取父评论id
+        parent_id = ret.parent_id
 
         # 3.逻辑处理
-        # 3.1 新建评论模型对象，保存到数据库
-        comment_obj = Comment(user_id=user_id,
-                              article_id=article_id,
-                              content=comment_content,
-                              parent_id=0)
-        db.session.add(comment_obj)
-        # 3.2 更新文章的评论数量
-        Article.query.filter(Article.id == article_id) \
-            .update({"comment_count": Article.comment_count + 1})
+        if parent_id:
+            # ===========【回复子评论】=============
+            # 创建子评论对象
+            comment_obj = Comment(user_id=user_id,
+                                  article_id=article_id,
+                                  content=comment_content,
+                                  parent_id=parent_id)
 
-        # 3.3 提交到数据库
-        db.session.commit()
+            # 查询子评论对应的主评论，更新回复评论数量 + 1
+            # 主评论：Comment.query.filter(Comment.id == parent_id)
+            Comment.query.filter(Comment.id == parent_id).update({"reply_count": Comment.reply_count + 1})
 
-        # 4.返回值处理
-        return {"com_id": comment_obj.id,
-                "target": article_id}
+            # 提交数据到数据库
+            db.session.add(comment_obj)
 
+            # 注意：需要提交到数据库
+            db.session.commit()
+
+            # 返回子评论数据
+            return {
+                "com_id": comment_obj.id,
+                "target": article_id,
+                "parent_id": parent_id,
+                "mesaage": "回复子评论成功"
+            }
+
+        else:
+            # ===========【发布主评论】=============
+            # 3.1 新建评论模型对象，保存到数据库
+            comment_obj = Comment(user_id=user_id,
+                                  article_id=article_id,
+                                  content=comment_content,
+                                  parent_id=0)
+            db.session.add(comment_obj)
+            # 3.2 更新文章的评论数量
+            Article.query.filter(Article.id == article_id) \
+                .update({"comment_count": Article.comment_count + 1})
+
+            # 3.3 提交到数据库
+            db.session.commit()
+
+            # 4.返回值处理
+            return {"com_id": comment_obj.id,
+                    "target": article_id,
+                    "mesaage": "发布主评论成功"}
 
     """查询评论列表接口类视图"""
     """
@@ -129,7 +160,7 @@ class CommentResource(Resource):
 
         # 3.5 查询所有评论最后一条评论的id 作为：end_id
         #  最后一条评论的id, 前端用于判断是否剩余评论, 无值返回None
-        end_comment = Comment.query.filter(Comment.article_id == source).\
+        end_comment = Comment.query.filter(Comment.article_id == source). \
             order_by(Comment.id.desc()).first()
         end_id = end_comment.id if end_comment else None
 
