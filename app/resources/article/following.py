@@ -2,11 +2,52 @@ from flask import g
 from flask_restful import Resource
 from sqlalchemy.orm import load_only
 from datetime import datetime
-
 from app import db
 from models.user import Relation, User
 from utils.decorators import login_required
 from flask_restful.reqparse import RequestParser
+
+
+class UnUserFollowingResource(Resource):
+    """取消关注类视图"""
+
+    method_decorators = {"delete": [login_required]}
+
+    """
+    思路：
+        # 1.获取参数
+        # 1.1 当前登录用户： user_id
+        # 1.2 作者id： author_id
+        # 2.参数校验
+        # 3.逻辑处理
+        # 3.1 根据user_id和author_id去关系表中查询，并将其关系更新成取消关注
+        # 3.2 当前用户user_id 关注数量-1
+        # 3.2 作者author_id 粉丝数量-1
+        # 3.3 提交保存到数据库
+        # 4.返回响应
+
+    """
+
+    def delete(self, author_id):
+        # 1.获取参数
+        # 1.1 当前登录用户： user_id   粉丝id：张三
+        user_id = g.user_id
+        # 1.2 作者id： author_id    作者id: 李四
+        # 3.逻辑处理
+        # 3.1 根据user_id和author_id去关系表中查询，并将其关系更新成取消关注
+        Relation.query.filter(Relation.user_id == user_id,
+                              Relation.author_id == author_id,
+                              Relation.relation == Relation.RELATION.FOLLOW) \
+            .update({"relation": Relation.RELATION.DELETE, "update_time": datetime.now()})
+
+        # 3.2 当前用户user_id 关注数量-1
+        User.query.filter(User.id == user_id).update({"following_count": User.following_count - 1})
+        # 3.2 作者author_id 粉丝数量-1
+        User.query.filter(User.id == author_id).update({"fans_count": User.fans_count - 1})
+        # 3.3 提交保存到数据库
+        db.session.commit()
+
+        return {"target": author_id, "message": "取消关注成功"}
 
 
 class UserFollowingResource(Resource):
@@ -64,8 +105,8 @@ class UserFollowingResource(Resource):
                                                     User.fans_count)) \
             .join(Relation, User.id == Relation.author_id) \
             .filter(Relation.user_id == user_id,
-                    Relation.relation == Relation.RELATION.FOLLOW).\
-            order_by(Relation.update_time.desc()).paginate(page,per_page)
+                    Relation.relation == Relation.RELATION.FOLLOW). \
+            order_by(Relation.update_time.desc()).paginate(page, per_page)
 
         # 当前用户的关注列表
         following_list = paginate_obj.items
