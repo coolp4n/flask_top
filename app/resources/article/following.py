@@ -27,12 +27,13 @@ class UnUserFollowingResource(Resource):
         # 4.返回响应
 
     """
-
-    def delete(self, author_id):
+    # 注意：路由转换器的变量名称和形参名字要保持一致
+    def delete(self, target):
         # 1.获取参数
         # 1.1 当前登录用户： user_id   粉丝id：张三
         user_id = g.user_id
         # 1.2 作者id： author_id    作者id: 李四
+        author_id = target
         # 3.逻辑处理
         # 3.1 根据user_id和author_id去关系表中查询，并将其关系更新成取消关注
         Relation.query.filter(Relation.user_id == user_id,
