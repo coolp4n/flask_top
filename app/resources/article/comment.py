@@ -117,26 +117,76 @@ class CommentResource(Resource):
         parser.add_argument("offset", type=int, location="args", default=0)
         parser.add_argument("source", type=int, location="args", required=True)
         parser.add_argument("limit", type=int, location="args", default=10)
+        # 使用type参数区分主、子评论
+        # 其中type=a 代表主评论列表
+        # 其中type=c 代表子评论列表
+        parser.add_argument("type", type=regex(r'[ac]'), location="args", required=True)
+
         ret = parser.parse_args()
         # 1.1 offset：大于偏移量的评论
         offset = ret.offset
-        # 1.2 source = 文章id
+        # 1.2 source = 文章id or 父评论id
         source = ret.source
         # 1.3 limit: 限制条数，分页
         limit = ret.limit
+        # 1.4 提取类型
+        type = ret.type
 
         # 3.逻辑处理
-        # 3.1 查询评论表中偏移量大于offset的限定条数limit的评论，该评论属于当前article_id文章下的评论
-        comments = db.session.query(Comment.id,
-                                    Comment.user_id,
-                                    User.name,
-                                    User.profile_photo,
-                                    Comment.ctime,
-                                    Comment.content,
-                                    Comment.reply_count,
-                                    Comment.like_count) \
-            .join(User, Comment.user_id == User.id) \
-            .filter(Comment.article_id == source, Comment.id > offset).limit(limit).all()
+        if type == "a":
+            # ============【查询主评论列表】===============
+            # 3.1 查询评论表中偏移量大于offset的限定条数limit的评论，该评论属于当前article_id文章下的评论
+            # TODO: 只查询主评论列表 Comment.parent_id == 0
+            # 注意：source 代表文章id
+            comments = db.session.query(Comment.id,
+                                        Comment.user_id,
+                                        User.name,
+                                        User.profile_photo,
+                                        Comment.ctime,
+                                        Comment.content,
+                                        Comment.reply_count,
+                                        Comment.like_count) \
+                .join(User, Comment.user_id == User.id) \
+                .filter(Comment.article_id == source,
+                        Comment.id > offset, Comment.parent_id == 0).limit(limit).all()
+
+            last_id = comments[-1].id if comments else None
+
+            # 3.4 查询主评论总数量
+            total_count = Comment.query.filter(Comment.article_id == source, Comment.parent_id == 0).count()
+
+            # 3.5 查询所有评论最后一条评论的id 作为：end_id
+            #  最后一条评论的id, 前端用于判断是否剩余评论, 无值返回None
+            end_comment = Comment.query.filter(Comment.article_id == source, Comment.parent_id == 0). \
+                order_by(Comment.id.desc()).first()
+
+            end_id = end_comment.id if end_comment else None
+
+        else:
+            # ============【查询子评论列表】===============
+            # 注意：source 代表 parent_id
+            comments = db.session.query(Comment.id,
+                                        Comment.user_id,
+                                        User.name,
+                                        User.profile_photo,
+                                        Comment.ctime,
+                                        Comment.content,
+                                        Comment.reply_count,
+                                        Comment.like_count) \
+                .join(User, Comment.user_id == User.id) \
+                .filter(Comment.id > offset, Comment.parent_id == source).limit(limit).all()
+
+            last_id = comments[-1].id if comments else None
+
+            # 3.4 查询子评论总数量
+            total_count = Comment.query.filter(Comment.parent_id == source).count()
+
+            # 3.5 查询所有评论最后一条评论的id 作为：end_id
+            #  最后一条评论的id, 前端用于判断是否剩余评论, 无值返回None
+            end_comment = Comment.query.filter(Comment.parent_id == source). \
+                order_by(Comment.id.desc()).first()
+
+            end_id = end_comment.id if end_comment else None
 
         # 3.2 评论对象转换成字典
         comment_dict_list = [{
@@ -149,20 +199,6 @@ class CommentResource(Resource):
             "reply_count": item.reply_count,
             "like_count": item.like_count
         } for item in comments]
-
-        # 3.3 当前页最后一条评论的id， 作为：last_id
-        # 本次请求最后一条评论的id, 上拉加载更多 作为下次请求的offset, 无值返回None
-        # 当前组最后一条评论：comments[-1]
-        last_id = comments[-1].id if comments else None
-
-        # 3.4 查询评论总数量
-        total_count = Comment.query.filter(Comment.article_id == source).count()
-
-        # 3.5 查询所有评论最后一条评论的id 作为：end_id
-        #  最后一条评论的id, 前端用于判断是否剩余评论, 无值返回None
-        end_comment = Comment.query.filter(Comment.article_id == source). \
-            order_by(Comment.id.desc()).first()
-        end_id = end_comment.id if end_comment else None
 
         return {
             "total_count": total_count,

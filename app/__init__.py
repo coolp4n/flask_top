@@ -5,6 +5,7 @@ import sys
 import os
 from redis import StrictRedis
 from flask_migrate import Migrate
+from models.routing_db.routing_sqlalchemy import RoutingSQLAlchemy
 
 # 2.将common添加到系统搜索路径中
 # /Users/chenqian/Desktop/深圳37期Flask项目/HMTopNews
@@ -18,7 +19,10 @@ from utils.constants import EXTRA_ENV_COINFIG
 
 # 创建db数据库对象，此时还未绑定Flask应用
 # 暴露给其他模块调用
-db = SQLAlchemy()
+# db = SQLAlchemy()
+
+# 创建读写分离的数据库对象
+db = RoutingSQLAlchemy()
 
 # redis客户端对象暴露给其他模块调用, 并且声明其类型为StrictRedis的对象
 redis_client = None  # type:StrictRedis

@@ -144,20 +144,24 @@ class LoginRegisterResource(Resource):
 
         # 3.3 一致：根据手机号码查询数据库，是否账号是否存在
         # load_only 优化查询
+        # 查询-从库
         user = User.query.options(load_only(User.id)).filter(User.mobile == phone).first()
 
         if user is None:
             # 3.4 账号不存在：直接注册，创建新的用户对象，添加到数据库
             user = User(name=phone, mobile=phone, last_login=datetime.now())
+            # 写-主库
             db.session.add(user)
         else:
             # 3.5 账号存在：直接登录，修改最近一次登录时间，
             user.last_login = datetime.now()
 
         # TODO:最后完成提交操作
+        # 写--主库
         db.session.commit()
 
         # 4.返回值处理
+        # 查 --从库
         token, refresh_token = self._genrateJWT(user.id)
         # 4.1 返回用户token和refresh_token
         return {"token": token, "refresh_token": refresh_token}, 201

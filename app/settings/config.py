@@ -22,6 +22,12 @@ class DevelopmentConfig(DefaultConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
 
+    SQLALCHEMY_BINDS = {
+        "master": 'mysql+pymysql://root:mysql@192.168.243.154:3306/HMTopnews37',  # 主库
+        "slave1": 'mysql+pymysql://root:mysql@192.168.243.154:8306/HMTopnews37',  # 从库
+        "slave2": 'mysql+pymysql://root:mysql@192.168.243.154:3306/HMTopnews37'  # 从库
+    }
+
     # redis数据库配置[注意：连接到redis的主数据库]
     # TODO: 服务器redis设置外网能够访问
     # REDIS_HOST = "192.168.243.154"
