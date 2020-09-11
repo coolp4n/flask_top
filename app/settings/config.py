@@ -12,20 +12,37 @@ class DefaultConfig(object):
     QINIU_BUCKET_NAME = 'szpython37'
     QINIU_DOMAIN = 'http://qg457zgw6.hn-bkt.clouddn.com/'
 
+    # 设置哨兵的ip和端口
+    SENTINEL_LIST = [
+        ('192.168.243.155', 26380),
+        ('192.168.243.155', 26381),
+        ('192.168.243.155', 26382),
+    ]
+
+    # 哨兵配置的主数据库别名
+    SERVICE_NAME = 'mymaster'
+
+    # 设置集群的ip和端口
+    CLUSTER_NODES = [
+        {"host": "192.168.243.155", "port": 7000},
+        {"host": "192.168.243.155", "port": 7001},
+        {"host": "192.168.243.155", "port": 7002},
+    ]
+
 
 class DevelopmentConfig(DefaultConfig):
     """开发模式的配置类"""
     DEBUG = True
 
     # mysql数据库配置
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:mysql@192.168.243.154:3306/HMTopnews37"
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:mysql@192.168.243.155:3306/HMTopnews37"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
 
     SQLALCHEMY_BINDS = {
-        "master": 'mysql+pymysql://root:mysql@192.168.243.154:3306/HMTopnews37',  # 主库
-        "slave1": 'mysql+pymysql://root:mysql@192.168.243.154:8306/HMTopnews37',  # 从库
-        "slave2": 'mysql+pymysql://root:mysql@192.168.243.154:3306/HMTopnews37'  # 从库
+        "master": 'mysql+pymysql://root:mysql@192.168.243.155:3306/HMTopnews37',  # 主库
+        "slave1": 'mysql+pymysql://root:mysql@192.168.243.155:8306/HMTopnews37',  # 从库
+        "slave2": 'mysql+pymysql://root:mysql@192.168.243.155:3306/HMTopnews37'  # 从库
     }
 
     # redis数据库配置[注意：连接到redis的主数据库]
