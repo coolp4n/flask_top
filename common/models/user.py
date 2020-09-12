@@ -25,7 +25,8 @@ class User(db.Model):
             'id': self.id,
             'name': self.name,
             'photo': self.profile_photo,
-            'intro': self.introduction,
+            # 注意：redis不支持None类型 但是支持空字符串
+            'intro': self.introduction if self.introduction else "",
             'art_count': self.article_count,
             'follow_count': self.following_count,
             'fans_count': self.fans_count
@@ -48,7 +49,6 @@ class Relation(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, doc='主键ID')
     user_id = db.Column(db.Integer, doc='用户ID')  # 粉丝id
-    author_id = db.Column(db.Integer, doc='目标用户ID') # 作者id
+    author_id = db.Column(db.Integer, doc='目标用户ID')  # 作者id
     relation = db.Column(db.Integer, doc='关系')
     update_time = db.Column(db.DateTime, default=datetime.now, doc='更新时间')
-

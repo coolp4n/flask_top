@@ -8,6 +8,7 @@ from sqlalchemy.orm import load_only
 from flask_restful.reqparse import RequestParser
 from utils.parser import imgtype
 from utils.img_storage import upload_file
+from cache.user import UserCache
 
 
 class UserPhotoResource(Resource):
@@ -69,6 +70,9 @@ class UserPhotoResource(Resource):
         # 提交修改头像操作
         db.session.commit()
 
+        # 清除redis缓存-防止脏数据 mysql和redis中profile_photo数据不一致
+        UserCache(user_id).clear()
+
         # 4.返回值处理
         # 4.1 将完整的图片url地址返回给前端
         return {"full_url": full_url}
@@ -85,15 +89,25 @@ class CurrentUserResource(Resource):
 
         # 2.根据id查询用户信息
         # select * from xxtable where id = user_id
-        user = User.query.options(load_only(User.id,
-                                            User.name,
-                                            User.profile_photo,
-                                            User.introduction,
-                                            User.article_count,
-                                            User.following_count,
-                                            User.fans_count)).filter(User.id == user_id).first()
+        # user = User.query.options(load_only(User.id,
+        #                                     User.name,
+        #                                     User.profile_photo,
+        #                                     User.introduction,
+        #                                     User.article_count,
+        #                                     User.following_count,
+        #                                     User.fans_count)).filter(User.id == user_id).first()
+
+        # 创建用户缓存类对象
+        usercache_tool = UserCache(user_id)
+        # 查询缓存--返回值：用户字典
+        user_dict = usercache_tool.get()
 
         # 3.用户对象序列化成字典
-        user_dict = user.to_dict()
+        # user_dict = user.to_dict()
 
-        return user_dict
+        # 有用户数据
+        if user_dict:
+            return user_dict
+        # 没有用户数据
+        else:
+            return {"message": "invalid user"}, 400

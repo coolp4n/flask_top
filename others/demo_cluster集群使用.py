@@ -12,8 +12,15 @@ startup_nodes = [
 # 支持写一个集群的ip和端口，就能找到整个集群中的所有数据库
 # 支持以列表的形式填写多个集群的ip和端口
 # decode_responses=True 将bytes数据转换成字符串
-cluster_cli = RedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+cluster_cli = RedisCluster(startup_nodes=startup_nodes)
 
 # 3.使用集群进行数据增删改查
-cluster_cli.set("user1", "kobe")
-print(cluster_cli.get("user1"))
+# cluster_cli.set("user2", "kobe666")
+# print(cluster_cli.get("user2"))
+
+
+user_dict = {'id': 7, 'name': '18511112221', 'photo': 'http://qg457zgw6.hn-bkt.clouddn.com/FpIa10YMbJkXIB77-HF4Fvt-sxek', 'intro': "", 'art_count': 0, 'follow_count': 1, 'fans_count': 0}
+
+cluster_cli.hmset("user:7777:basic", user_dict)
+
+print(cluster_cli.hgetall("user:7777:basic"))
