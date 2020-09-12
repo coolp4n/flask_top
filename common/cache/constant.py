@@ -21,8 +21,6 @@ class UserCacheTTL(BaseCacheTTL):
     TTL = 60 * 60 * 2
     MAX_DELTA = 60 * 20
 
-    # 1111
-    # 2222
 
 
 class UserNotExeistCacheTTL(BaseCacheTTL):
