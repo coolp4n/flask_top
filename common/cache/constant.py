@@ -21,6 +21,8 @@ class UserCacheTTL(BaseCacheTTL):
     TTL = 60 * 60 * 2
     MAX_DELTA = 60 * 20
 
+    # 1111
+
 
 class UserNotExeistCacheTTL(BaseCacheTTL):
     """用户不存在过期时间类"""
