@@ -106,8 +106,9 @@ def register_extensions(app: Flask):
     redis_slave = sentinel_cli.slave_for(app.config["SERVICE_NAME"],
                                          decode_responses=True)
     global redis_cluster
-    redis_cluster = RedisCluster(startup_nodes=app.config["CLUSTER_NODES"],
-                                 decode_responses=True)
+    # redis_cluster = RedisCluster(startup_nodes=app.config["CLUSTER_NODES"],
+    #                              decode_responses=True)
+    redis_cluster = StrictRedis(decode_responses=True)
 
 
     # TODO：注意：先自定义转换器，再注册蓝图，因为蓝图注册的时候就用到了自定义的转换器

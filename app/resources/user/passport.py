@@ -1,6 +1,6 @@
 from flask_restful import Resource
 import random
-from app import redis_cluster, db
+from app import redis_cluster, db, redis_master
 from models.user import User
 from utils.constants import APP_SMSCODE_EXPIRE
 from datetime import datetime, timedelta
@@ -26,7 +26,7 @@ class SMSCodesResource(Resource):
         # app:code:18511112222  123456
         code_key = "app:code:{}".format(mobile)
         # 使用集群保存短信验证码
-        redis_cluster.setex(name=code_key, time=APP_SMSCODE_EXPIRE, value=random_code)
+        redis_master.setex(name=code_key, time=APP_SMSCODE_EXPIRE, value=random_code)
 
         # 3.调用第三方模块发送短信验证
         print("短信验证码：手机号码：{}  code: {}".format(mobile, random_code))
@@ -137,7 +137,7 @@ class LoginRegisterResource(Resource):
         # 3.1 根据手机号码去redis数据库取出真实的短信验证码 real_smscode
         redis_key = "app:code:{}".format(phone)
         # 使用集群取出短信验证码
-        real_smscode = redis_cluster.get(redis_key)
+        real_smscode = redis_master.get(redis_key)
         # 3.2 短信验证码是否有值，是否和用户填写的短信验证码一致
         # 注意： "123456"  b'123456' decode_responses=True
         if real_smscode is None or real_smscode != smscode:

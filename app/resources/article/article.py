@@ -4,6 +4,7 @@ from flask_restful.reqparse import RequestParser
 from datetime import datetime
 from sqlalchemy.orm import load_only
 from app import db
+from cache.user import UserFansCache
 from models.article import Article, ArticleContent, Collection, Attitude
 from models.user import User, Relation
 from utils.constants import HOME_PRE_PAGE
@@ -63,15 +64,21 @@ class ArticleDetailResource(Resource):
             # 1.查询当前登录用户是否关注文章作者
             # 查询条件：Relation.user_id == user_id 当前登录的用户是粉丝id
             # 查询条件：Relation.author_id == article.user_id 文章的作者id
-            relation = Relation.query.options(load_only(Relation.id)) \
-                .filter(Relation.user_id == user_id,
-                        Relation.author_id == article.user_id).first()
+            # relation = Relation.query.options(load_only(Relation.id)) \
+            #     .filter(Relation.user_id == user_id,
+            #             Relation.author_id == article.user_id).first()
+            #
+            # # 赋值关注关系
+            # article_dict["is_followed"] = True if relation else False
 
-            # 赋值关注关系
-            article_dict["is_followed"] = True if relation else False
+            # 当前用户 ===> 作者
+            # 作者的粉丝列表中有当前用户
+            # 作者：article.user_id
+            # 当前用户：user_id
+            article_dict["is_followed"] = UserFansCache(article.user_id).has_fans(user_id)
 
             # 2.查询当前登录用户是否收藏当前文章
-            collection = Collection.query.options(load_only(Collection.id)) \
+            collection = Collection. (load_only(Collection.id)) \
                 .filter(Collection.user_id == user_id,
                         Collection.article_id == article.id,
                         Collection.is_deleted == False).first()

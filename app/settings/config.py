@@ -4,7 +4,7 @@ class DefaultConfig(object):
     # 共同的配置信息
     SCRECT_KEY = "python37"
     # restful中不允许ascii编码
-    RESTFUL_JSON = {"ensure_ascii": False}
+    # RESTFUL_JSON = {"ensure_ascii": False}
 
     # 七牛云的配置信息
     QINIU_ACCESS_KEY = 'W0oGRaBkAhrcppAbz6Nc8-q5EcXfL5vLRashY4SI'

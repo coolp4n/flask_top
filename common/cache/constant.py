@@ -22,7 +22,6 @@ class UserCacheTTL(BaseCacheTTL):
     MAX_DELTA = 60 * 20
 
 
-
 class UserNotExeistCacheTTL(BaseCacheTTL):
     """用户不存在过期时间类"""
     pass
@@ -33,4 +32,10 @@ class AriticleCacheTTL(BaseCacheTTL):
     # 基础过期时长
     # 文章数据2小时过期基础时长
     TTL = 60 * 60 * 2
+    MAX_DELTA = 60 * 20
+
+
+class UserFollowingCacheTTL(BaseCacheTTL):
+    TTL = 60 * 60 * 2
+    # 20分钟内随机过期-防止雪崩
     MAX_DELTA = 60 * 20
